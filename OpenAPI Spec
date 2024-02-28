@@ -1,0 +1,138 @@
+openapi: 3.0.0
+info:
+  title: Movie Seating API
+  description: This API provides endpoints for users to select a seat, which includes reserving and/or canceling a reservation.
+  version: 0.1.9
+
+paths:
+  /movies/{movie_id}/showtimes/{showtime_id}/seats:
+    get:
+      summary: Get available seats for selected showtime
+      parameters:
+        - name: movie_id
+          in: path
+          required: true
+          description: The ID of the selected movie by the user
+          schema:
+            type: string
+        - name: showtime_id
+          in: path
+          required: true
+          description: The ID of the selected showtime of the movie selected by the user
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  example: "A1"
+        '404':
+          description: Showtime or movie not found 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: “6:15 PM is not found for Power Rangers”
+    post:
+      summary: Reserve a seat for selected showtime and movie
+      parameters:
+        - name: movie_id
+          in: path
+          required: true
+          description: The ID of the selected movie by the user
+          schema:
+            type: string
+        - name: showtime_id
+          in: path
+          required: true
+          description: The ID of the selected showtime of the movie selected by the user
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                seat_number:
+                  type: string
+                  description: The seat number to reserve
+              example:
+                seat_number: “A1”
+      responses:
+        '201':
+          description: Seat reserved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Seat reserved successfully"
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Seat is already reserved"
+
+paths:
+  /movies/{movie_id}/showtimes/{showtime_id}/seats/{seat_number}:
+    delete:
+      summary: User can cancel their seat reservation for their selected movie/showtime
+      parameters:
+        - name: movie_id
+          in: path
+          required: true
+          description: The ID of the selected movie by the user
+          schema:
+            type: string
+        - name: showtime_id
+          in: path
+          required: true
+          description: The ID of the selected showtime of the movie selected by the user
+          schema:
+            type: string
+        - name: seat_number
+          in: path
+          required: true
+          description: This is the number of the seat that will be canceled
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Seat reservation canceled successfully
+        '404':
+          description: Seat number, movie, or showtime not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: “Seat A1 for Power Rangers at 6:15 PM not found"
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Failed to cancel reservation"
